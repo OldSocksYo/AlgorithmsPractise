@@ -56,65 +56,104 @@ public class FindMaxPoint {
     }
 
     static int getMaxMemory(String memory, int cnt){
-        char[] chars = memory.toCharArray();
-        if(cnt == 0){
-            return findMaxPoint(chars);
-        }
-        int max = 0;
-        int cusRound = 0;
-        int temp = 0;
-        while (cusRound < chars.length){
-            for (int i = cusRound; i < chars.length; i++) {
-                if(chars[i] == 'x'){
-                    chars[i] = '.';
-                    temp++;
+        char[] memChars = memory.toCharArray();
+        // 当前轮第一个遇到的x
+        int firstX = -1;
+        // 当前轮已经计数过的x个数
+        // 在这里，我们不真的去替换x，只是把它当做.来计算即可
+        int tmpCnt = 0;
+        // 当前轮已经计数的.的个数
+        int currentCountedPoint = 0;
+        // 当前已经完成的所有情况下的最大连续点的个数
+        int maxContinuousPoint = 0;
+        for (int i = 0; i < memChars.length; i++) {
+            if (memChars[i] == '.') {
+                currentCountedPoint++;
+            } else if (memChars[i] == 'x') {
+                if (tmpCnt == 0) {
+                    // 记录当前轮中第一个遇到的x
+                    firstX = i;
                 }
-                // 已经替换了cnt个x后，判断一次最大的.的数量
-                if(temp == cnt){
-                    max = Math.max(findMaxPoint(chars), max);
-                    // 将chars重置为输入的字符串样式，为下一轮做准备
-                    chars = memory.toCharArray();
-                    //temp 归0
-                    temp = 0;
+                tmpCnt++;
+                if (tmpCnt <= cnt) {
+                    currentCountedPoint++;
+                } else {
+                    // 当前“替换”的x的数量已经超过cnt了，回溯到当前这一轮计数中的第一个x的位置
+                    maxContinuousPoint = Math.max(maxContinuousPoint, currentCountedPoint);
+                    currentCountedPoint = 0;
+                    tmpCnt = 0;
+                    i = firstX;
                 }
             }
-            //如果cnt大于当前字符串中x的总数，也计算一次将所有x替换为.后的.的最大数量
-            if(temp < cnt){
-                max = Math.max(findMaxPoint(chars), max);
+            if ((i+1) == memChars.length) {
+                // 当cnt的个数多余memory中实际的x的个数时，防止越界；
+                // 当计数到最后一个字符后，用当前已经计数的.来求一次最大的.数
+                maxContinuousPoint = Math.max(maxContinuousPoint, currentCountedPoint);
             }
-            cusRound ++;
         }
-
-        return max;
+        return maxContinuousPoint;
     }
 
-
-    //找出“xxx...xx...x..x..x..”中最大的连续.的数量
-    static int findMaxPoint(char[] chars){
-        int i = 0; // 记录第几轮查找
-        int j = 0; // 用来做每轮循环中下标的移动
-        int max = 0; // 最大的.数量
-        while (i < chars.length){
-            int tempMax = 0; //每轮循环中. 的数量
-            // 如果当前一轮中第一个字符不是.,直接i++，进行下一轮
-            if(chars[i] != '.'){
-                i++;
-                continue;
-            }
-            // 用j保存当前轮的第一个.的位置
-            j = i;
-            // 循环查找i之后连续的.，并用tempMax保存其个数
-            while (j < chars.length){
-                if(chars[j] == '.'){
-                    tempMax++;
-                    j++;
-                }else{
-                    break;
-                }
-            }
-            max = Math.max(tempMax, max);
-            i++;
-        }
-        return max;
-    }
+    //static int getMaxMemory(String memory, int cnt){
+    //    char[] chars = memory.toCharArray();
+    //    if(cnt == 0){
+    //        return findMaxPoint(chars);
+    //    }
+    //    int max = 0;
+    //    int cusRound = 0;
+    //    int temp = 0;
+    //    while (cusRound < chars.length){
+    //        for (int i = cusRound; i < chars.length; i++) {
+    //            if(chars[i] == 'x'){
+    //                chars[i] = '.';
+    //                temp++;
+    //            }
+    //            // 已经替换了cnt个x后，判断一次最大的.的数量
+    //            if(temp == cnt){
+    //                max = Math.max(findMaxPoint(chars), max);
+    //                // 将chars重置为输入的字符串样式，为下一轮做准备
+    //                chars = memory.toCharArray();
+    //                //temp 归0
+    //                temp = 0;
+    //            }
+    //        }
+    //        //如果cnt大于当前字符串中x的总数，也计算一次将所有x替换为.后的.的最大数量
+    //        if(temp < cnt){
+    //            max = Math.max(findMaxPoint(chars), max);
+    //        }
+    //        cusRound ++;
+    //    }
+    //
+    //    return max;
+    //}
+    //
+    //
+    ////找出“xxx...xx...x..x..x..”中最大的连续.的数量
+    //static int findMaxPoint(char[] chars){
+    //    int i = 0; // 记录第几轮查找
+    //    int j = 0; // 用来做每轮循环中下标的移动
+    //    int max = 0; // 最大的.数量
+    //    while (i < chars.length){
+    //        int tempMax = 0; //每轮循环中. 的数量
+    //        // 如果当前一轮中第一个字符不是.,直接i++，进行下一轮
+    //        if(chars[i] != '.'){
+    //            i++;
+    //            continue;
+    //        }
+    //        // 用j保存当前轮的第一个.的位置
+    //        j = i;
+    //        // 循环查找i之后连续的.，并用tempMax保存其个数
+    //        while (j < chars.length){
+    //            if(chars[j] == '.'){
+    //                tempMax++;
+    //                j++;
+    //            }else{
+    //                break;
+    //            }
+    //        }
+    //        max = Math.max(tempMax, max);
+    //        i++;
+    //    }
+    //    return max;
+    //}
 }

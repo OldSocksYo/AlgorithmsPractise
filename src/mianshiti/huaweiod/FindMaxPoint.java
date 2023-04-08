@@ -61,29 +61,30 @@ public class FindMaxPoint {
             return findMaxPoint(chars);
         }
         int max = 0;
-        int cusIndex = 0;
+        int cusRound = 0;
         int temp = 0;
-        while (cusIndex < chars.length){
-            if(chars[cusIndex] == 'x'){
-                chars[cusIndex] = '.';
-                temp++;
+        while (cusRound < chars.length){
+            for (int i = cusRound; i < chars.length; i++) {
+                if(chars[i] == 'x'){
+                    chars[i] = '.';
+                    temp++;
+                }
+                // 已经替换了cnt个x后，判断一次最大的.的数量
+                if(temp == cnt){
+                    max = Math.max(findMaxPoint(chars), max);
+                    // 将chars重置为输入的字符串样式，为下一轮做准备
+                    chars = memory.toCharArray();
+                    //temp 归0
+                    temp = 0;
+                }
             }
-            // 已经替换了cnt个x后，判断一次最大的.的数量
-            if(temp == cnt){
+            //如果cnt大于当前字符串中x的总数，也计算一次将所有x替换为.后的.的最大数量
+            if(temp < cnt){
                 max = Math.max(findMaxPoint(chars), max);
-                // 将chars重置为输入的字符串样式，为下一轮做准备
-                chars = memory.toCharArray();
-                //temp 归0
-                temp = 0;
-                // 指针回退一个，让下一轮循环，直接从上轮的最后一个x的位置再次开始
-                cusIndex --;
             }
-            cusIndex ++;
+            cusRound ++;
         }
-        //如果cnt大于当前字符串中x的总数，也计算一次将所有x替换为.后的.的最大数量
-        if(temp < cnt){
-            max = Math.max(findMaxPoint(chars), max);
-        }
+
         return max;
     }
 
